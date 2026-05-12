@@ -6,7 +6,7 @@ Thư mục này dùng để nộp minh chứng thiết lập môi trường lab.
 
 - Họ tên: Nguyễn Trọng Nam
 - Mã sinh viên: 1771020495
-- Nhóm: 6A
+- Nhóm: A6
 - Vai trò dự kiến trong nhóm:
 - Hệ điều hành: Windows
 - Ghi chú:
