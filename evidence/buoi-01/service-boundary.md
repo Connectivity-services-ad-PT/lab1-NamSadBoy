@@ -85,4 +85,4 @@ Service nào gọi đến service này?
 
 Có thể vẽ bằng Mermaid, draw.io, Ludichart hoặc ảnh chụp sơ đồ.
 
-https://drive.google.com/file/d/1o2iXMi9G1Sk014C2BqxBB5cTVBl2WzfI/view?usp=sharing
+https://drive.google.com/file/d/1sd1zaWTCLop8VohSEMfey65949ZesW3D/view?usp=sharing
