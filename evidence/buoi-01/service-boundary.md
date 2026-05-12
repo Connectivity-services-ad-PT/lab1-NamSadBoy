@@ -5,7 +5,7 @@
 - Tên nhóm: 7a
 - Lớp: CNTT 17-10
 - Thành viên: Nguyễn Trọng Nam, Trần Quang Huy, Phạm Hoàng Anh
-- Service nhóm phụ trách: Core
+- Service nhóm phụ trách: Core Business
 - Sản phẩm tổng thể của lớp:
 
 ## 2. Actor
