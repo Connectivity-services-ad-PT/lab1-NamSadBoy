@@ -2,7 +2,7 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm: 7a
+- Tên nhóm: 6A
 - Lớp: CNTT 17-10
 - Thành viên: Nguyễn Trọng Nam, Trần Quang Huy, Phạm Hoàng Anh
 - Service nhóm phụ trách: Core Business
