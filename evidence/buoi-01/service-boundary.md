@@ -85,4 +85,4 @@ Service nào gọi đến service này?
 
 Có thể vẽ bằng Mermaid, draw.io, Ludichart hoặc ảnh chụp sơ đồ.
 
-https://lucid.app/lucidchart/54697421-fa81-4f3d-9d5c-921d3d42963a/edit?viewport_loc=-3519%2C-480%2C12253%2C5895%2C0_0&invitationId=inv_382ce477-8b25-463c-8cb9-aa6441ee6df3
+https://drive.google.com/file/d/1o2iXMi9G1Sk014C2BqxBB5cTVBl2WzfI/view?usp=sharing
