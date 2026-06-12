@@ -1,88 +1,113 @@
-# Service Boundary của nhóm
+# Service Boundary - Core Business
 
-## 1. Thông tin nhóm
+## 1. Thong tin nhom
 
-- Tên nhóm: 6A
-- Lớp: CNTT 17-10
-- Thành viên: Nguyễn Trọng Nam, Trần Quang Huy, Phạm Hoàng Anh
-- Service nhóm phụ trách: Core Business
-- Sản phẩm tổng thể của lớp:
+- Ten nhom: 6A
+- Lop: CNTT 17-10
+- Thanh vien: Nguyen Trong Nam, Tran Quang Huy, Pham Hoang Anh
+- Service phu trach: Core Business (Policy Engine)
+- San pham: Smart Campus Operations Platform
 
-## 2. Actor
+## 2. Actor va consumer
 
-Ai tương tác với hệ thống/service?
+- Access Gate: goi Core de kiem tra quyen ra/vao theo thoi gian thuc.
+- Quan tri vien: tao, cap nhat va vo hieu hoa policy.
+- Operator/Security: tra cuu quyet dinh va canh bao de audit.
+- IoT Ingestion: publish sensor event cho Core danh gia policy.
+- API Gateway: xac thuc va chuyen request tu ung dung quan tri.
 
-- Client/Web Application
-- API Gateway
-- Các service khác trong hệ thống
+## 3. System boundary
 
-## 3. System Boundary
+Core Business kiem soat:
 
-Nhóm em xây phần nào?
+- Policy truy cap va policy canh bao cua smart campus.
+- Logic danh gia `ALLOW`/`DENY` cho yeu cau ra/vao.
+- Quyet dinh policy, ma ly do, thoi han va audit trail.
+- Vong doi alert duoc tao tu policy.
+- Idempotency cua request danh gia policy.
 
-Phần nhóm kiểm soát:
+Core Business chi tich hop, khong so huu:
 
-- Xử lý logic nghiệp vụ cốt lõi của hệ thống
-- Quản lý dữ liệu chính (core entities)
-- Cung cấp các API cơ bản cho các service khác
+- Du lieu the va trang thai cong cua Access Gate.
+- Ket qua detect/face match cua AI Vision.
+- Telemetry goc cua IoT Ingestion.
+- Kenh gui email/SMS/push cua Notification.
+- Kho du lieu tong hop va KPI cua Analytics.
 
-Phần nhóm chỉ tích hợp:
+## 4. Trach nhiem cua service
 
-- Giao tiếp với các service khác qua API
-- Sử dụng shared infrastructure (cache, message queue)
+Service PHAI:
 
-## 4. Service Boundary
+- Danh gia request truy cap theo policy dang active.
+- Tra ket qua nhat quan, co `decisionId`, `reasonCode` va `policyId`.
+- Luu quyet dinh de tra cuu va audit.
+- Tu choi payload sai schema bang Problem Details.
+- Bao ve API nghiep vu bang Bearer token; de `/health` public.
+- Phat event `policy.decision.created` va `alert.created` cho downstream.
 
-Service của nhóm có trách nhiệm gì?
+Service KHONG:
 
-- Quản lý các entity cốt lõi của hệ thống
-- Xử lý business logic chính
-- Cung cấp API cho các service khác sử dụng
-- Đảm bảo tính toàn vẹn dữ liệu
+- Dieu khien phan cung cong hoac camera.
+- Thuc hien nhan dien hinh anh.
+- Gui notification truc tiep den nguoi dung.
+- Tong hop dashboard/KPI.
+- Luu secret that trong source code.
 
-Service KHÔNG làm gì?
+## 5. Input va output
 
-- KHÔNG xử lý logic riêng của các service khác
-- KHÔNG quản lý dữ liệu không thuộc service này
-- KHÔNG gửi trực tiếp response cho end user (thông qua API Gateway)
+### Input chinh
 
-## 5. Input / Output
+- `cardId`, `gateId`, `direction`, `occurredAt` tu Access Gate.
+- Thuoc tinh chu the nhu role, card status va zone.
+- Sensor/vision event tu cac service khac qua queue hoac adapter.
+- Cau hinh policy tu quan tri vien.
 
-### Input
+### Output chinh
 
-- Request API từ các service khác
-- Dữ liệu từ các service khi thực hiện tích hợp
-- Yêu cầu từ API Gateway
+- `ALLOW` hoac `DENY` kem ma ly do co the xu ly bang may.
+- `decisionId`, `policyId`, `evaluatedAt`, `expiresAt` de audit.
+- Problem Details cho loi 400/401/403/404/409/422/500.
+- Event bat dong bo cho Notification va Analytics.
 
-### Output
+## 6. API du kien
 
-- Response API với dữ liệu entity cốt lõi
-- Event/Message gửi đến message queue
-- Status code và error message
-
-## 6. API dự kiến
-
-| Method | Endpoint | Mục đích |
+| Method | Endpoint | Muc dich |
 |---|---|---|
-| GET | /health | Kiểm tra service |
-| GET | /core/entities | Lấy danh sách entity cốt lõi |
-| GET | /core/entities/{id} | Lấy chi tiết entity |
-| POST | /core/entities | Tạo mới entity |
-| PUT | /core/entities/{id} | Cập nhật entity |
-| DELETE | /core/entities/{id} | Xóa entity |
+| GET | `/health` | Kiem tra service va phien ban |
+| POST | `/policies/evaluate-access` | Danh gia quyen ra/vao realtime |
+| GET | `/policies/{policyId}` | Lay policy de debug/audit |
+| POST | `/policies` | Tao policy moi |
+| GET | `/decisions/{decisionId}` | Tra cuu quyet dinh da tao |
+| GET | `/alerts` | Liet ke alert do policy engine tao |
 
-## 7. Phụ thuộc service khác
+## 7. Phu thuoc theo Dependency Map
 
-Service này gọi đến service nào?
+| Huong | Service | Co che | Muc dich |
+|---|---|---|---|
+| Access Gate -> Core | Core la Provider | REST sync | Kiem tra policy ra/vao realtime |
+| Core -> AI Vision | Core la Consumer | REST sync | Lay ket qua phan tich/detect |
+| Core -> Access Gate | Core la Consumer | REST sync | Doc log quet the/trang thai cong khi can |
+| IoT Ingestion -> Core | Core la Consumer | Queue async | Nhan sensor event moi |
+| Core -> Notification | Core la Producer | Queue async | Trigger alert da kenh |
+| Core -> Analytics | Core la Producer | Queue async | Feed policy decision va alert cho KPI |
 
-- (Tùy thuộc vào architecture, có thể gọi các service phụ trợ)
+## 8. So do boundary
 
-Service nào gọi đến service này?
+```mermaid
+flowchart LR
+    Gate[Access Gate] -->|POST evaluate-access| Core[Core Business Policy Engine]
+    Admin[Admin API Gateway] -->|Manage policies| Core
+    IoT[IoT Ingestion] -->|sensor events| Core
+    Core -->|query detections| Vision[AI Vision]
+    Core -->|alert.created| Notify[Notification]
+    Core -->|policy.decision.created| Analytics[Analytics]
+    Core --> DB[(Policy and audit store)]
+```
 
-- Tất cả các service khác trong hệ thống cần dữ liệu cốt lõi
+## 9. Phi chuc nang va nguyen tac tich hop
 
-## 8. Sơ đồ minh họa
-
-Có thể vẽ bằng Mermaid, draw.io, Ludichart hoặc ảnh chụp sơ đồ.
-
-https://drive.google.com/file/d/1sd1zaWTCLop8VohSEMfey65949ZesW3D/view?usp=sharing
+- Target p95 cho evaluate access: duoi 300 ms trong moi truong lab.
+- Access Gate fail-closed neu Core timeout hoac tra 5xx.
+- Retry phai gui `Idempotency-Key` de khong tao quyet dinh trung.
+- Tat ca request co `correlationId` de trace xuyen service.
+- Event co `eventId`, `occurredAt`, `schemaVersion` va `correlationId`.
